@@ -6,7 +6,8 @@ namespace WebApi.Web
     {
         public static void Register(HttpConfiguration config)
         {
-            // Web API configuration and services
+            // Enable Cors
+            config.EnableCors();
 
             // Web API routes
             config.MapHttpAttributeRoutes();

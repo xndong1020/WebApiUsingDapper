@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using System.Net;
 using System.Web.Http;
+using System.Web.Http.Cors;
 using WebApi.Core;
 using WebApi.Service;
 using WebApi.Web.Models;
@@ -8,6 +9,7 @@ using WebApi.Web.Models;
 namespace WebApi.Web.Controllers
 {
     [RoutePrefix("api/v1/Department")]
+    [EnableCors(origins: "*", headers: "*", methods: "*")]
     public class DepartmentController : ApiController
     {
         private readonly IDepartmentService _service;
