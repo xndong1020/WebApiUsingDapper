@@ -62,7 +62,7 @@ namespace WebApi.Web.Controllers
             if (result == 0)
                 return NotFound();
 
-            return StatusCode(HttpStatusCode.Accepted);
+            return Ok();
         }
 
         // DELETE api/Department/Delete/id
@@ -75,7 +75,7 @@ namespace WebApi.Web.Controllers
             if (result == 0)
                 return NotFound();
 
-            return StatusCode(HttpStatusCode.Accepted);
+            return StatusCode(HttpStatusCode.NoContent);
         }
     }
 }
