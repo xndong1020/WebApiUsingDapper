@@ -1,4 +1,8 @@
 ﻿using AutoMapper;
+using NLog;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Web.Http;
 using System.Web.Http.Cors;
@@ -13,6 +17,7 @@ namespace WebApi.Web.Controllers
     public class DepartmentController : ApiController
     {
         private readonly IDepartmentService _service;
+        private static readonly Logger logger = LogManager.GetCurrentClassLogger();
 
         public DepartmentController(IDepartmentService service)
         {
@@ -24,7 +29,45 @@ namespace WebApi.Web.Controllers
         [HttpGet]
         public IHttpActionResult Get()
         {
-            return Ok(_service.GetDepartments());
+            try
+            {
+                return Ok(_service.GetDepartments());
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+                return StatusCode(HttpStatusCode.ServiceUnavailable);
+            }
+        }
+
+        // GET api/Department/Get
+        [Route("")]
+        [ActionName("Get")]
+        [HttpGet]
+        public IHttpActionResult GetWithPaging(int? pageNumber, int pageSize = 2)
+        {
+            try
+            {
+                IList<Department> departments;
+                if (pageNumber.HasValue)
+                {
+                    departments = _service.GetDepartments()
+                                          .Skip(pageSize * (pageNumber.Value - 1))
+                                          .Take(pageSize)
+                                          .ToList();
+
+                }
+                else
+                    departments = _service.GetDepartments().ToList();
+
+                return Ok(departments);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+                return StatusCode(HttpStatusCode.ServiceUnavailable);
+            }
+
         }
 
         // GET api/Department/Get/id
@@ -32,7 +75,15 @@ namespace WebApi.Web.Controllers
         [HttpGet]
         public IHttpActionResult Get(int id)
         {
-            return Ok(_service.GetDepartment(id, "Employees"));
+            try
+            {
+                return Ok(_service.GetDepartment(id, "Employees"));
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+                return StatusCode(HttpStatusCode.ServiceUnavailable);
+            }
         }
 
         // POST api/Department/POST
@@ -40,12 +91,20 @@ namespace WebApi.Web.Controllers
         [HttpPost]
         public IHttpActionResult Post(DepartmentDTO departmentDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var department = Mapper.Map<Department>(departmentDto);
-            department.Id = _service.InsertDepartment(department);
-            return Created("/api/Department/Get/" + department.Id, department);
+                var department = Mapper.Map<Department>(departmentDto);
+                department.Id = _service.InsertDepartment(department);
+                return Created("/api/Department/Get/" + department.Id, department);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+                return StatusCode(HttpStatusCode.ServiceUnavailable);
+            }
         }
 
         // PUT api/Department/PUT
@@ -53,16 +112,24 @@ namespace WebApi.Web.Controllers
         [HttpPut]
         public IHttpActionResult Put(DepartmentDTO departmentDto)
         {
-            if (!ModelState.IsValid)
-                return BadRequest(ModelState);
+            try
+            {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
 
-            var department = Mapper.Map<Department>(departmentDto);
-            var result = _service.UpdateDepartment(department);
+                var department = Mapper.Map<Department>(departmentDto);
+                var result = _service.UpdateDepartment(department);
 
-            if (result == 0)
-                return NotFound();
+                if (result == 0)
+                    return NotFound();
 
-            return Ok();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+                return StatusCode(HttpStatusCode.ServiceUnavailable);
+            }
         }
 
         // DELETE api/Department/Delete/id
@@ -70,12 +137,20 @@ namespace WebApi.Web.Controllers
         [HttpDelete]
         public IHttpActionResult Delete(int id)
         {
-            var result = _service.DeleteDepartment(id);
+            try
+            {
+                var result = _service.DeleteDepartment(id);
 
-            if (result == 0)
-                return NotFound();
+                if (result == 0)
+                    return NotFound();
 
-            return StatusCode(HttpStatusCode.NoContent);
+                return StatusCode(HttpStatusCode.NoContent);
+            }
+            catch (Exception e)
+            {
+                logger.Error(e);
+                return StatusCode(HttpStatusCode.ServiceUnavailable);
+            }
         }
     }
 }
