@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.Linq;
 using Dapper;
 using WebApi.Core;
 
@@ -12,13 +13,16 @@ namespace WebApi.Repository
     {
         private static readonly string connectionString = ConfigurationManager.ConnectionStrings["DefaultConnectionString"].ConnectionString;
 
-        public IEnumerable<Department> GetAll()
+        public IEnumerable<Department> GetAll(string searchKeyword, int pageNumber, int pageSize)
         {
             using (IDbConnection db = new SqlConnection(connectionString))
             {
                 db.Open();
+                var sql = @"SELECT * FROM tblDepartment WHERE DepartmentName LIKE N'%" + searchKeyword + "%' OR Location LIKE N'%" + searchKeyword + "%' OR DepartmentHead LIKE N'%" + searchKeyword + "%'";
                 // 返回所有的departments 
-                return db.Query<Department>("SELECT * FROM tblDepartment");
+                return db.Query<Department>(sql)
+                         .Skip(pageSize * (pageNumber - 1))
+                         .Take(pageSize);
             }
         }
 

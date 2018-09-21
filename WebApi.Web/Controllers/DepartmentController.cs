@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using NLog;
 using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Web.Http;
@@ -27,39 +26,11 @@ namespace WebApi.Web.Controllers
         // GET api/Department/Get
         [Route("")]
         [HttpGet]
-        public IHttpActionResult Get()
+        public IHttpActionResult Get(string searchKeyword, int pageNumber = 1, int pageSize = 2)
         {
             try
             {
-                return Ok(_service.GetDepartments());
-            }
-            catch (Exception e)
-            {
-                logger.Error(e);
-                return StatusCode(HttpStatusCode.ServiceUnavailable);
-            }
-        }
-
-        // GET api/Department/Get
-        [Route("")]
-        [ActionName("Get")]
-        [HttpGet]
-        public IHttpActionResult GetWithPaging(int? pageNumber, int pageSize = 2)
-        {
-            try
-            {
-                IList<Department> departments;
-                if (pageNumber.HasValue)
-                {
-                    departments = _service.GetDepartments()
-                                          .Skip(pageSize * (pageNumber.Value - 1))
-                                          .Take(pageSize)
-                                          .ToList();
-
-                }
-                else
-                    departments = _service.GetDepartments().ToList();
-
+                var departments = _service.GetDepartments(searchKeyword, pageNumber, pageSize).ToList();
                 return Ok(departments);
             }
             catch (Exception e)

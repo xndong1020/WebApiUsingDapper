@@ -14,9 +14,9 @@ namespace WebApi.Service
             _repo = repo;
         }
 
-        public IEnumerable<Department> GetDepartments()
+        public IEnumerable<Department> GetDepartments(string searchKeyword, int pageNumber, int pageSize)
         {
-            return _repo.GetAll();
+            return _repo.GetAll(searchKeyword, pageNumber, pageSize);
         }
 
         public Department GetDepartment(int id, string relatedEntity)
